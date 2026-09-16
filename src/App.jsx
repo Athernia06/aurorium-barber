@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import {
   Scissors,
   MapPin,
@@ -14,6 +15,7 @@ import {
   Award,
   History,
   Timer,
+  TrendingUp,
   Users,
   CheckCircle2,
   Zap,
@@ -343,28 +345,54 @@ function Navbar({ view, onNavigate, user, onOpenAuth, onOpenMember, onLogout }) 
 }
 
 function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBranch, serving, ticket, isLoggedIn }) {
-  const stats = [
-    { icon: Store, value: '4+', label: 'Franchise Outlets' },
-    { icon: Users, value: '25k+', label: 'Happy Members' },
-    { icon: Award, value: '4.9', label: 'Average Rating' },
-    { icon: Timer, value: '~3 min', label: 'Avg. Booking Time' },
-  ]
+  const reduceMotion = useReducedMotion()
+  const { scrollY } = useScroll()
+  const zero = [0, 0]
 
-  const highlights = [
-    { icon: Zap, text: 'Real-time queue tracking' },
-    { icon: MapPin, text: 'GPS branch detection' },
-    { icon: Wallet, text: 'Points on every visit' },
+  const bgY = useTransform(scrollY, [0, 800], reduceMotion ? zero : [0, -150])
+  const bgScale = useTransform(scrollY, [0, 800], reduceMotion ? [1, 1] : [1, 1.15])
+  const textY = useTransform(scrollY, [0, 600], reduceMotion ? zero : [0, 180])
+  const textOpacity = useTransform(scrollY, [0, 520], reduceMotion ? [1, 1] : [1, 0])
+  const cardY = useTransform(scrollY, [0, 800], reduceMotion ? zero : [0, -140])
+  const cardOpacity = useTransform(scrollY, [0, 560], reduceMotion ? [1, 1] : [1, 0])
+
+  const trust = [
+    { icon: Award, text: '4.9 franchise rating' },
+    { icon: Users, text: '25k+ members' },
+    { icon: Store, text: '4 flagship outlets' },
   ]
 
   return (
-    <section className="relative mx-auto max-w-6xl px-4 pt-14 pb-16 sm:px-6 lg:pt-20 lg:pb-24">
-      <div className="grid items-center gap-12 lg:grid-cols-2">
-        <div>
+    <section className="relative flex min-h-screen items-center overflow-hidden">
+      <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+        <motion.div style={{ y: bgY, scale: bgScale }} className="absolute -inset-40 will-change-transform">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#141b2c] via-ink to-ink" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_72%_18%,rgba(255,107,0,0.16),transparent)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_35%_at_15%_80%,rgba(245,158,11,0.08),transparent)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.4)_1px,transparent_0)] bg-[length:22px_22px] opacity-[0.08]" />
+          <div className="absolute inset-0 [background:repeating-linear-gradient(115deg,transparent_0_44px,rgba(255,158,11,0.5)_44px_45px)] opacity-[0.05]" />
+          <div className="absolute top-1/2 -right-24 h-[34rem] w-[34rem] -translate-y-1/2 rounded-[3rem] bg-gradient-to-br from-amber-400/[0.08] to-ember/[0.06] blur-3xl" />
+          <Scissors
+            className="absolute -right-12 -bottom-16 h-[30rem] w-[30rem] -rotate-[35deg] text-white/[0.035]"
+            strokeWidth={0.8}
+          />
+        </motion.div>
+        <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-b from-transparent to-ink" />
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-ink to-transparent" />
+      </div>
+
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-2">
+        <motion.div style={{ y: textY, opacity: textOpacity }} className="will-change-transform">
+          <motion.div
+            initial={{ opacity: 0, y: 44 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
           <GlowBadge>
             <Sparkles className="h-3.5 w-3.5" />
             Premium Barber Franchise
           </GlowBadge>
-          <h1 className="mt-5 text-4xl leading-[1.1] font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-6 text-4xl leading-[1.08] font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             Grooming Fit for Kings —{' '}
             <span className="bg-gradient-to-r from-amber-400 to-ember bg-clip-text text-transparent">
               Without the Wait.
@@ -378,7 +406,7 @@ function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBran
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <button
               onClick={() => onNavigate('queue')}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-ember px-6 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-ember/30 transition-transform hover:scale-[1.03] active:scale-95"
+              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-ember px-6 py-3.5 text-sm font-bold text-slate-950 shadow-xl shadow-ember/30 transition-transform hover:scale-[1.03] active:scale-95"
             >
               <Ticket className="h-4 w-4" />
               Quick Ticket Booking
@@ -386,7 +414,7 @@ function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBran
             <button
               onClick={onDetect}
               disabled={detecting}
-              className="flex items-center gap-2 rounded-2xl border border-slate-800 bg-coal px-6 py-3.5 text-sm font-semibold text-slate-200 transition-colors hover:border-amber-400/40 hover:text-amber-300 disabled:opacity-60"
+              className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-semibold text-slate-200 backdrop-blur transition-colors hover:border-amber-400/40 hover:text-amber-300 disabled:opacity-60"
             >
               {detecting ? <LoaderIcon /> : <LocateFixed className={cx('h-4 w-4', nearestBranch && 'text-emerald-400')} />}
               {detecting ? 'Locating…' : 'Detect Nearest Barber'}
@@ -403,43 +431,40 @@ function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBran
             </div>
           )}
 
-          <div className="mt-8 flex flex-wrap gap-2.5">
-            {highlights.map((h) => (
-              <span
-                key={h.text}
-                className="flex items-center gap-2 rounded-full border border-slate-800/80 bg-coal/70 px-3.5 py-2 text-xs font-semibold text-slate-300"
-              >
-                <h.icon className="h-3.5 w-3.5 text-amber-400" />
-                {h.text}
+          <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-white/5 pt-6">
+            {trust.map((t) => (
+              <span key={t.text} className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                <t.icon className="h-4 w-4 text-amber-400" />
+                {t.text}
               </span>
             ))}
           </div>
+          </motion.div>
+        </motion.div>
 
-          <div className="mt-10 grid grid-cols-2 gap-5 border-t border-slate-800/60 pt-6 sm:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="leading-tight">
-                <s.icon className="h-4.5 w-4.5 text-amber-400" />
-                <p className="mt-2 text-xl font-extrabold text-white">{s.value}</p>
-                <p className="mt-0.5 text-[11px] text-slate-500">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative hidden lg:block">
-          <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-amber-400/15 via-transparent to-ember/15 blur-2xl" />
-          <div className="relative overflow-hidden rounded-[2rem] border border-slate-800/80 bg-gradient-to-b from-slate-900 to-coal p-6 shadow-2xl shadow-black/50">
+        <motion.div
+          style={{ y: cardY, opacity: cardOpacity }}
+          className="relative hidden justify-self-end will-change-transform lg:block"
+        >
+          <motion.div
+            initial={{ opacity: 0, x: 70 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="relative"
+          >
+            <div className="absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-amber-400/15 via-transparent to-ember/15 blur-2xl" />
+          <div className="animate-float relative w-[23rem] overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.06] p-6 shadow-2xl shadow-black/60 backdrop-blur-xl">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold tracking-widest text-slate-500 uppercase">Live Board</span>
+              <span className="text-[11px] font-bold tracking-widest text-slate-400 uppercase">Live Board</span>
               <span className="flex items-center gap-2 text-[11px] font-bold tracking-widest text-emerald-400 uppercase">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
                 Online
               </span>
             </div>
-            <p className="mt-3 font-mono text-6xl font-extrabold tracking-tight text-amber-400 tabular-nums">
+            <p className="mt-3 bg-gradient-to-r from-amber-300 to-ember bg-clip-text font-mono text-6xl font-extrabold tracking-tight text-transparent tabular-nums">
               {selectedBranch.code}-{padNumber(serving)}
             </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-400">
               {selectedBranch.name} · {selectedBranch.barbers} barbers on duty
             </p>
 
@@ -447,7 +472,7 @@ function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBran
               {ticket ? (
                 <div className="flex items-center justify-between rounded-2xl border border-amber-400/40 bg-amber-400/10 px-4 py-3">
                   <span className="font-mono text-sm font-extrabold text-amber-400">{ticket.id}</span>
-                  <span className="text-xs text-slate-400">{ticket.serviceName}</span>
+                  <span className="text-xs text-slate-300">{ticket.serviceName}</span>
                   <span className="rounded-full bg-amber-400/20 px-2.5 py-1 text-[10px] font-bold tracking-widest text-amber-300 uppercase">
                     You
                   </span>
@@ -456,12 +481,12 @@ function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBran
                 [1, 2, 3].map((n) => (
                   <div
                     key={n}
-                    className="flex items-center justify-between rounded-2xl border border-slate-800/60 bg-ink/60 px-4 py-3"
+                    className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3"
                   >
                     <span className="font-mono text-sm font-bold text-slate-400">
                       {selectedBranch.code}-{padNumber(serving + n)}
                     </span>
-                    <span className="text-xs text-slate-600">in queue</span>
+                    <span className="text-xs text-slate-500">in queue</span>
                   </div>
                 ))
               )}
@@ -473,14 +498,168 @@ function HeroView({ onNavigate, onDetect, detecting, nearestBranch, selectedBran
                 'mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border py-3 text-sm font-bold transition-colors',
                 isLoggedIn
                   ? 'border-amber-400/40 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20'
-                  : 'border-slate-800 bg-ink/60 text-slate-300 hover:border-amber-400/30 hover:text-amber-300',
+                  : 'border-white/10 bg-white/[0.04] text-slate-200 hover:border-amber-400/30 hover:text-amber-300',
               )}
             >
               Open Live Tracker
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+function Reveal({ children, delay = 0, className }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+function PillarCard({ pillar }) {
+  const Icon = pillar.icon
+  return (
+    <div
+      className={cx(
+        'group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-900/50 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-400/30 hover:bg-slate-900/80 hover:shadow-xl hover:shadow-black/30',
+      )}
+    >
+      <div
+        className="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-gradient-to-br from-amber-400/10 to-ember/10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+        aria-hidden="true"
+      />
+      <div className="flex items-start justify-between">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/20 to-ember/20 text-amber-400 transition-colors group-hover:from-amber-400 group-hover:to-ember group-hover:text-slate-950">
+          <Icon className="h-5 w-5" />
+        </span>
+        {pillar.visual}
+      </div>
+      <h3 className="mt-4 text-lg font-extrabold text-white">{pillar.title}</h3>
+      <p className="mt-2 text-xs leading-relaxed text-slate-400">{pillar.description}</p>
+      <div className="mt-5 border-t border-slate-800/60 pt-4">
+        <p className="bg-gradient-to-r from-amber-300 to-ember bg-clip-text font-mono text-3xl font-extrabold text-transparent tabular-nums">
+          {pillar.stat}
+        </p>
+        <p className="mt-1 text-[11px] text-slate-500">{pillar.statLabel}</p>
+      </div>
+    </div>
+  )
+}
+
+function QueueMiniVisual() {
+  return (
+    <div className="hidden gap-1.5 sm:flex" aria-hidden="true">
+      {[0, 1, 2].map((n) => (
+        <span
+          key={n}
+          className={cx(
+            'h-1.5 w-6 rounded-full',
+            n === 0 ? 'animate-pulse bg-gradient-to-r from-amber-400 to-ember' : 'bg-slate-700',
+          )}
+          style={{ animationDelay: `${n * 0.35}s` }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function RetentionMiniVisual() {
+  return (
+    <div className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-slate-800 sm:block" aria-hidden="true">
+      <div className="h-full w-[92%] rounded-full bg-gradient-to-r from-amber-400 to-ember" />
+    </div>
+  )
+}
+
+function WhySection({ onNavigate }) {
+  const pillars = [
+    {
+      icon: Zap,
+      title: 'Real-Time Queue Ecosystem',
+      description:
+        'Every chair streams its status live. Members claim a ticket from home and walk in exactly when the barber is ready — zero waiting-room time, zero clipped ticket stubs.',
+      stat: '~0 min',
+      statLabel: 'average lobby wait with a pre-booked ticket',
+      span: 'sm:col-span-2 lg:col-span-2',
+      visual: <QueueMiniVisual />,
+    },
+    {
+      icon: MapPin,
+      title: 'GPS Auto-Routing',
+      description:
+        'One tap detects the customer and routes them to the nearest chair across all franchise outlets, ranked by live distance and current wait.',
+      stat: '1.2 km',
+      statLabel: 'median distance from member to nearest outlet',
+      span: '',
+      visual: null,
+    },
+    {
+      icon: Scissors,
+      title: 'Master Stylist SOP',
+      description:
+        'Every stylist trains on the same certified grooming protocol, so a Gentleman Cut feels identical at any franchise outlet in the network.',
+      stat: '12-step',
+      statLabel: 'certified grooming protocol at every chair',
+      span: '',
+      visual: null,
+    },
+    {
+      icon: TrendingUp,
+      title: 'High Customer Retention',
+      description:
+        'Aurora Points stack on every visit and redeem instantly against services — turning one-off walk-ins into loyal monthly regulars.',
+      stat: '92%',
+      statLabel: 'of members return within 30 days',
+      span: 'sm:col-span-2 lg:col-span-2',
+      visual: <RetentionMiniVisual />,
+    },
+  ]
+
+  return (
+    <section className="overflow-hidden border-t border-slate-800/60 bg-coal/40">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+        <Reveal>
+          <SectionHeading
+            kicker="Why Aurorium"
+            title="Built Like a Franchise Machine"
+            description="Four business pillars engineered into every outlet — the same playbook that turns first-time guests into franchise revenue."
+            align="center"
+          />
+        </Reveal>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {pillars.map((p, i) => (
+            <Reveal key={p.title} delay={i * 0.08} className={p.span}>
+              <PillarCard pillar={p} />
+            </Reveal>
+          ))}
         </div>
+
+        <Reveal delay={0.15}>
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-5 rounded-3xl border border-amber-400/20 bg-gradient-to-r from-amber-400/10 to-ember/10 px-7 py-6 shadow-[0_0_30px_rgba(255,107,0,0.08)]">
+            <div>
+              <p className="text-lg font-extrabold text-white">Ready for a chair that is already yours?</p>
+              <p className="mt-1 text-sm text-slate-400">Grab a live ticket now — skip the lobby entirely.</p>
+            </div>
+            <button
+              onClick={() => onNavigate('queue')}
+              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-ember px-6 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-ember/30 transition-transform hover:scale-[1.03] active:scale-95"
+            >
+              <Ticket className="h-4 w-4" />
+              Take Queue Ticket
+            </button>
+          </div>
+        </Reveal>
       </div>
     </section>
   )
@@ -1503,7 +1682,7 @@ export default function App({ initialView = 'home' }) {
   }
 
   return (
-    <div className="relative min-h-screen bg-ink text-slate-100">
+    <div className="relative min-h-screen overflow-x-clip bg-ink text-slate-100">
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.07),transparent_55%)]" />
         <div className="absolute top-0 left-1/2 h-[28rem] w-[50rem] -translate-x-1/2 rounded-full bg-amber-500/[0.05] blur-3xl" />
@@ -1522,16 +1701,19 @@ export default function App({ initialView = 'home' }) {
 
       <main key={view} className="view-in">
         {view === 'home' && (
-          <HeroView
-            onNavigate={setView}
-            onDetect={handleDetect}
-            detecting={detecting}
-            nearestBranch={nearestBranch}
-            selectedBranch={selectedBranch}
-            serving={serving}
-            ticket={user ? ticket : null}
-            isLoggedIn={Boolean(user)}
-          />
+          <div className="min-h-[200vh]">
+            <HeroView
+              onNavigate={setView}
+              onDetect={handleDetect}
+              detecting={detecting}
+              nearestBranch={nearestBranch}
+              selectedBranch={selectedBranch}
+              serving={serving}
+              ticket={user ? ticket : null}
+              isLoggedIn={Boolean(user)}
+            />
+            <WhySection onNavigate={setView} />
+          </div>
         )}
         {view === 'branches' && (
           <BranchesView
